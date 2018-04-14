@@ -2057,6 +2057,20 @@ size_t BinaryenModuleWrite(BinaryenModuleRef module, char* output, size_t output
   return bytes;
 }
 
+static std::shared_ptr<BufferWithRandomAccess> buffer;
+
+size_t BinaryenModuleWrite2(BinaryenModuleRef module) {
+  Module* wasm = (Module*)module;
+  buffer = std::make_shared<BufferWithRandomAccess>(false);
+  WasmBinaryWriter writer(wasm, *buffer, false);
+  writer.write();
+  return buffer->size();
+}
+
+uint8_t* BinaryenModuleWrite2GetBuffer() {
+  return &*buffer->begin();
+}
+
 BinaryenModuleRef BinaryenModuleRead(char* input, size_t inputSize) {
   if (tracing) {
     std::cout << "  // BinaryenModuleRead\n";
